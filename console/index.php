@@ -83,10 +83,25 @@ $flagDir = "../flags";
 function update_flags() {
         global $flagDir;
 	global $output;
-	chdir('actual_flags'); 		// bash script is stupid and needs to be run from the right directory. If run from the wrong one, the script will nuke the country list file.
-	exec('./update-flags.sh'); 	// ls -1 *.png | sed -e 's/\..*$//' | tee  flag_list.txt  ../../flag_list_api2.txt > /dev/null // not going to reimplement in php
-	chdir('..');
-	include "list-flag.php"; 	// updates the management form. 
+
+        $flagList = "";
+        chdir('../flags/actual_flags');
+        $fileList = glob("*.png");
+        foreach ($fileList as $fileName) {
+                $flagName = substr($fileName, 0, -4);
+                $flagList .= "{$flagName}\n";
+        }
+
+        $stack = new Imagick();
+        foreach( $fileList as $fileName) {
+                $stack->addImage(new Imagick($fileName));
+        }
+        $montage = $stack->montageImage( new ImagickDraw(), "0x0", "16x11", 0, "0");
+        $montage->writeImage("../../console/montage.png");
+
+        file_put_contents("flag_list.txt", $flagList);
+        chdir('../../console');
+	include "list_flags.php"; 	// updates the management form. 
 	$output = $output . "flags updated <br />";
 }
 
