@@ -352,7 +352,7 @@ if (isset($_POST['merge_flags'])) {
 	<a href="https://nineball.party/srsbsn/3521" id="subLink">official thread</a> <br />
 	</div>
 <hr>
-<form action="upload-flag.php" method="post" enctype="multipart/form-data">
+<form action="index.php" method="post" enctype="multipart/form-data">
 <div id="management">
 	<div id="buttons">
 	password (used for managing flags only): <input type="password" name="passwd" 
