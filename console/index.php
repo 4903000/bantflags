@@ -81,6 +81,7 @@ $hashArray = array();
 $flagDir = "../flags";
 
 function update_flags() {
+        global $flagDir;
 	global $output;
 	chdir('actual_flags'); 		// bash script is stupid and needs to be run from the right directory. If run from the wrong one, the script will nuke the country list file.
 	exec('./update-flags.sh'); 	// ls -1 *.png | sed -e 's/\..*$//' | tee  flag_list.txt  ../../flag_list_api2.txt > /dev/null // not going to reimplement in php
@@ -117,7 +118,7 @@ function makeHashArray() {
 	// 2. place hashes in an array
 	// 3. return the array
 	global $hashArray;
-	$flags = fopen("actual_flags/flag_list.txt", "r");
+	$flags = fopen("{$flagDir}/actual_flags/flag_list.txt", "r");
 	if ($flags) {
 		while (($line = fgets($flags)) !== false) {
 			$line = substr($line, 0, -1);
@@ -199,7 +200,7 @@ if(isset($_POST["upload_flag"])) {
 //			}
 			if (checkflag($tmpFilePath, $newName)) {
 				if ($tmpFilePath != "") {
-					$newFilePath = "actual_flags/{$_FILES['upflags']['name'][$i]}"; 	// this is where $target_dir broke so it's hardcoded
+					$newFilePath = "{$flagDir}/actual_flags/{$_FILES['upflags']['name'][$i]}"; 	// this is where $target_dir broke so it's hardcoded
 					if (move_uploaded_file($tmpFilePath, $newFilePath)) {			// this nesting is ugly
 						$output = $output . "{$_FILES['upflags']['name'][$i]}  was uploaded<br />";
 						if (isset($_POST["gloss"]) && $_POST["gloss"] == "doGloss") {
@@ -233,7 +234,7 @@ if (isset($_POST["delete_flags"])) {
 		foreach($_POST["selected"] as $delete_flag) {
 			if (strpos($delete_flag, '/') !== false) {
 				$output = $output . "flag files don't exactly contain '/' <br />";
-			} else if (rename("actual_flags/{$delete_flag}.png", "dead_flags/{$delete_flag}.png")) {
+			} else if (rename("{$flagDir}/actual_flags/{$delete_flag}.png", "{$flagDir}dead_flags/{$delete_flag}.png")) {
 				$output = $output . "{$delete_flag} was deleted <br />";
 				$old_name = $delete_flag;
 				$new_name = "missingflag";
@@ -255,8 +256,8 @@ if (isset($_POST["gloss_flags"])) {
 		$output = $output . "nothing selected, nothing gloss <br />";
 	} else {
 		foreach($_POST["selected"] as $gloss_flag) {
-			copy("actual_flags/{$gloss_flag}.png", "dead_flags/{$gloss_flag}.png");
-			gloss("actual_flags/{$gloss_flag}.png");
+			copy("{$flagDir}actual_flags/{$gloss_flag}.png", "{$flagDir}dead_flags/{$gloss_flag}.png");
+			gloss("{$flagDir}actual_flags/{$gloss_flag}.png");
 		}
 		update_flags();
 	}
@@ -273,12 +274,12 @@ if (isset($_POST['rename_flags'])) {
 		} else {
 			// process rename
 			foreach ($_POST['rename'] as $old_name => $new_name) {
-				if (file_exists("actual_flags/{$new_name}.png")) {
+				if (file_exists("{$flagDir}actual_flags/{$new_name}.png")) {
 					$output = $output . "can't rename {$old_nmae}, file exists. <br />";
 				} else if (check_name($new_name)) {
 					$output = $output . "can't rename {$old_name}, name contains illegalities. <br />";
 				} else {
-					if (rename("actual_flags/{$old_name}.png", "actual_flags/{$new_name}.png")) {
+					if (rename("{$flagDir}actual_flags/{$old_name}.png", "actual_flags/{$new_name}.png")) {
 						$output = $output . "{$old_name} renamed as {$new_name} <br />";
 						include "update_db.php";
 					} else {
@@ -301,7 +302,7 @@ if (isset($_POST['rename_flags'])) {
 			}
 			$suggestList = ob_get_contents();
 			ob_end_clean();
-			file_put_contents("/home/stream/files/flags/suggestions_list.txt", $suggestList);
+			file_put_contents("suggestions_list.txt", $suggestList);
 			$output = $output . "suggestions list written <br />";
 			update_flags();
 		}
@@ -322,7 +323,7 @@ if (isset($_POST['merge_flags'])) {
 			foreach ($_POST['rename'] as $old_name => $new_name) {
 				if ($old_name != $new_name) {
 					if (file_exists("actual_flags/{$new_name}.png")) {
-      						if (rename ("actual_flags/{$old_name}.png", "dead_flags/{$old_name}.png")) {
+      						if (rename ("{$flagDir}actual_flags/{$old_name}.png", "{$flagDir}dead_flags/{$old_name}.png")) {
       						include "update_db.php";
 	      						$output = $output . "{$old_name} was merged into {$new_name} <br />";
 	      					} else {

@@ -14,12 +14,12 @@ ob_start(); 	// listen to output
 
 echo "<table>";
 
-$handle = fopen("actual_flags/flag_list.txt", "r");
+$handle = fopen("{$flagDir}/actual_flags/flag_list.txt", "r");
 if ($handle) {
     	while (($line = fgets($handle)) !== false) {
 	    	$line = substr($line, 0, -1); 	// each line has a newline at the end, gut it
 	    	echo "<tr><td><input type=\"checkbox\" name=\"selected[]\" value=\"{$line}\"></td>
-			<td><img src=\"actual_flags/{$line}.png\"></td>
+			<td><img src=\"{$flagDir}/actual_flags/{$line}.png\"></td>
 			<td id=\"flagName\">{$line}</td>
 			<td><input type=\"text\" name=\"rename[{$line}]\" value=\"{$suggestArray[$line]}\"/></td>
 			</tr>";
