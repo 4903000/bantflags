@@ -347,8 +347,8 @@ if (isset($_POST['merge_flags'])) {
 ?>
 <div id=content>
 	<div align="center">
-	<img src="https://nineball.party/files/montage.png" id="overview"><br />
-	<a href="https://nineball.party/files/bantflags.user.js" id="installLink"><b>install bantflags</b></a> <br />
+	<img src="montage.png" id="overview"><br />
+	<a href="bantflags.user.js" id="installLink"><b>install bantflags</b></a> <br />
 	<a href="https://nineball.party/srsbsn/3521" id="subLink">official thread</a> <br />
 	</div>
 <hr>
