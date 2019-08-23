@@ -63,5 +63,5 @@ then
 	*)
     esac
 else
-    guix environment --ad-hoc nginx php php-imagick
+    guix environment --ad-hoc nginx php php-imagick mariadb
 fi
