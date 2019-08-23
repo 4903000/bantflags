@@ -122,7 +122,8 @@ function gloss($flag) {
 	$target->writeImage($flag);
 	$target->destroy();
 	$gloss->destroy();
-	$output = $output . "{$flag} was glossed <br />";
+        $flagName = basename($flag, ".png");
+        $output = $output . "{$flagName} was glossed <br />";
 }
 
 function readHashArray($file) {
