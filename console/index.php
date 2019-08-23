@@ -137,7 +137,7 @@ function makeHashArray() {
 	if ($flags) {
 		while (($line = fgets($flags)) !== false) {
 			$line = substr($line, 0, -1);
-			$hashArray[hash_file("md5", "actual_flags/{$line}.png")] = "{$line}.png";
+			$hashArray[hash_file("md5", "{$flagDir}/actual_flags/{$line}.png")] = "{$line}.png";
 		}
 	}
 }
@@ -172,7 +172,8 @@ if(isset($_POST["upload_flag"])) {
 	// 2. the right resolution, 
 	// 3. there isn't a flag with the same name,
 	// 4. the flag name doesn't contain unallowed substrings like regionDividers
-	function checkflag($flag_file, $flag_name) {
+        function checkflag($flag_file, $flag_name) {
+                global $flagDir;
 		global $output;
 		$flag_dimensions = array(16,11);
 
@@ -185,7 +186,7 @@ if(isset($_POST["upload_flag"])) {
 		} else if (check_name($flag_name)) {
 			$output = $output . "{$flag_name} contains illegalities.<br />";
 			return false;
-		} else if (file_exists("actual_flags/{$flag_name}")) {
+		} else if (file_exists("{$flagDir}/actual_flags/{$flag_name}")) {
 			$output = $output . "{$flag_name} already exists<br />";
 			return false;
 		} else {
@@ -249,7 +250,7 @@ if (isset($_POST["delete_flags"])) {
 		foreach($_POST["selected"] as $delete_flag) {
 			if (strpos($delete_flag, '/') !== false) {
 				$output = $output . "flag files don't exactly contain '/' <br />";
-			} else if (rename("{$flagDir}/actual_flags/{$delete_flag}.png", "{$flagDir}dead_flags/{$delete_flag}.png")) {
+			} else if (rename("{$flagDir}/actual_flags/{$delete_flag}.png", "{$flagDir}/dead_flags/{$delete_flag}.png")) {
 				$output = $output . "{$delete_flag} was deleted <br />";
 				$old_name = $delete_flag;
 				$new_name = "missingflag";
@@ -271,8 +272,8 @@ if (isset($_POST["gloss_flags"])) {
 		$output = $output . "nothing selected, nothing gloss <br />";
 	} else {
 		foreach($_POST["selected"] as $gloss_flag) {
-			copy("{$flagDir}actual_flags/{$gloss_flag}.png", "{$flagDir}dead_flags/{$gloss_flag}.png");
-			gloss("{$flagDir}actual_flags/{$gloss_flag}.png");
+			copy("{$flagDir}/actual_flags/{$gloss_flag}.png", "{$flagDir}/dead_flags/{$gloss_flag}.png");
+			gloss("{$flagDir}/actual_flags/{$gloss_flag}.png");
 		}
 		update_flags();
 	}
@@ -289,12 +290,12 @@ if (isset($_POST['rename_flags'])) {
 		} else {
 			// process rename
 			foreach ($_POST['rename'] as $old_name => $new_name) {
-				if (file_exists("{$flagDir}actual_flags/{$new_name}.png")) {
-					$output = $output . "can't rename {$old_nmae}, file exists. <br />";
+				if (file_exists("{$flagDir}/actual_flags/{$new_name}.png")) {
+					$output = $output . "can't rename {$old_name}, file exists. <br />";
 				} else if (check_name($new_name)) {
 					$output = $output . "can't rename {$old_name}, name contains illegalities. <br />";
 				} else {
-					if (rename("{$flagDir}actual_flags/{$old_name}.png", "actual_flags/{$new_name}.png")) {
+					if (rename("{$flagDir}/actual_flags/{$old_name}.png", "{$flagDir}/actual_flags/{$new_name}.png")) {
 						$output = $output . "{$old_name} renamed as {$new_name} <br />";
 						include "update_db.php";
 					} else {
@@ -337,8 +338,8 @@ if (isset($_POST['merge_flags'])) {
       		} else { 
 			foreach ($_POST['rename'] as $old_name => $new_name) {
 				if ($old_name != $new_name) {
-					if (file_exists("actual_flags/{$new_name}.png")) {
-      						if (rename ("{$flagDir}actual_flags/{$old_name}.png", "{$flagDir}dead_flags/{$old_name}.png")) {
+					if (file_exists("{$flagDir}/actual_flags/{$new_name}.png")) {
+      						if (rename ("{$flagDir}/actual_flags/{$old_name}.png", "{$flagDir}/dead_flags/{$old_name}.png")) {
       						include "update_db.php";
 	      						$output = $output . "{$old_name} was merged into {$new_name} <br />";
 	      					} else {
