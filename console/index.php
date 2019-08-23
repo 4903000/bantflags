@@ -100,7 +100,10 @@ function update_flags() {
         $montage->writeImage("../../console/montage.png");
 
         file_put_contents("flag_list.txt", $flagList);
+
         chdir('../../console');
+
+        file_put_contents("../api/flag_list_api2.txt", $flagList);
 	include "list_flags.php"; 	// updates the management form. 
 	$output = $output . "flags updated <br />";
 }
