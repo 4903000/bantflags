@@ -1,0 +1,45 @@
+* bantflags
+  A more general and community-friendly variation of extraflags enabling user-created
+  flags without hard hierarcies.
+
+** system workings
+   The API's PHP files are used by the userscript to upload flag entries for posts
+   and to get flags for certain posts.
+   Both files access the backend database to query and to insert entries.
+   
+   The flags directory is used to store available flags. For backwards compatibility,
+   a number of symlinks can be provided so that a modified extraflags client can set 
+   one flag.
+   Because of legacy clients, each flag directory needs to list of the flags inside
+   in a text file.
+   
+   The console is used for managing available flags. Operations change the available
+   flags on disk, and then rebuild the API text file, the flag_list file in the flags
+   directory, and the HTML representation of the flag list.
+   If needed, update_db.php changes old database entries to reflect the changes done.
+
+   The script expects to find the files in api/ and flags/ in a certain place on the
+   server. The entirety of the console can be rewritten, but parts of it modify the
+   API files directly.
+
+   The current script expects to find resources at these locations:
+   
+   | postUrl                 | /files/post_flag_api2.php   |
+   | getUrl                  | /files/get_flags_api2.php   |
+   | flag list file          | /files/flag_list_api2.txt   |
+   | legacy flags directory  | /files/flags/<country>/*    |
+   | current flags directory | /files/flags/actual_flags/* |
+   
+   These will need to be routed by nginx.
+
+** wishful thinking
+
+*** How the workflow should be
+    1. clone repository to a directory
+    2. set up MySQL and PHP
+    3. have a web server serve things at specific locations
+    4. configure MySQL user and console passwords
+    5. add flags by
+       - adding flag files into the flags directory and updating flags via the console
+       - opening the console in a browser and uploading flags there
+    6. see if the client works
