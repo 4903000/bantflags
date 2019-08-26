@@ -44,6 +44,10 @@ reset_mysql() {
 	echo "mysql has been reset!"
     fi
 }
+init_dirs() {
+    mkdir -p flags/actual_flags flags/dead_flags \
+	  guix-env/mysql/data/ guix-env nginx/logs/ guix-env/php/log/ 	  
+}
 if [ "$GUIX_ENVIRONMENT" ]
 then
     # manage things here
