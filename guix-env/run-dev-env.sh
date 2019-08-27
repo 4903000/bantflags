@@ -56,6 +56,7 @@ then
 	quit)
 	    stop_php
 	    stop_nginx
+	    stop_mysql
 	    exit
 	    ;;
 	start|stop|reset)
