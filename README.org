@@ -1,26 +1,69 @@
-* bantflags
+* Bantflags
   A more general and community-friendly variation of extraflags enabling user-created
   flags without hard hierarcies.
 
-** system workings
-   The API's PHP files are used by the userscript to upload flag entries for posts
-   and to get flags for certain posts.
-   Both files access the backend database to query and to insert entries.
+* Backend
+  The backend is responsible for mediating flags between clients and providing a console
+  for managing flags.
+
+** Running with GUIX
+   Bantflags is developed using tooling available on [[https://guix.gnu.org/][GUIXSD]]. If you're running a system
+   with guix available, you can use =guix-env/run-dev-env.sh= to enter a working
+   development environment and to manage the services bantflags requires to function.
+
+   The script supports starting, stopping and restarting nginx, php-fpm and mysql.
+   Additionally, mysql and 'dirs' can be reset in order to create the files and
+   directories needed for bantflags and the services it requires. Call the script like
+   =guix-env/run-dev-env.sh <start/stop/restart> <nginx/php/mysql>=
+
+   The configurations inside the directories in =guix-env/= work with the above script but
+   should not be used as anything else but quick reference in a production setup.
+
+   Note that the php-imagick package is not available in guix or anywhere else.
+
+** Running elsewhere
+   You can reference the configuration files in =guix-env/= to figure out how to configure
+   the services bantflags requires on other systems.
+
+   The exact runtime dependencies for bantflags are:
+   - mysql service
+   - php-fpm
+   - imagick php extension
+
+** Setup and running
+   1. Have a web server serve the console and API endpoints.
+   2. Set up php-fpm for processing php files.
+   3. Set up a database server (MySQL or MariaDB) and create the users and schemas
+      described in =mysql/database.sql= *using different passwords* and make sure the
+      details (especially the socket) matches what's in =console/db.php=.
+   4. Create =console/suggestions_list.txt= and =console/flags_list.html= with =touch=,
+      and the directories =flags/actual_flags/= and =flags/dead_flags/= with =mkdir -p=; or
+      with =guix-env/run-dev-env.sh reset dirs=.
+   5. Change the passwords in =console/index.php=.
+   6. Add flags to the backend by either:
+      + adding flag files into the =flags/actual_flags/= directory and updating the flags
+        through the console, or
+      + uploading flag files through the console.
+   7. Make any changes to the script you wish and tell your friends about it.
+
+** System workings
+   The API's php files are used by the userscript to upload flag entries for posts and to
+   get flags for certain posts.  Both files access the backend database to query and to
+   insert entries.
    
-   The flags directory is used to store available flags. For backwards compatibility,
-   a number of symlinks can be provided so that a modified extraflags client can set 
-   one flag.
-   Because of legacy clients, each flag directory needs to list of the flags inside
+   The flags directory is used to store available flags. For backwards compatibility, a
+   number of symlinks can be provided so that a modified extraflags client can set one
+   flag.  Because of legacy clients, each flag directory needs to list of the flags inside
    in a text file.
    
-   The console is used for managing available flags. Operations change the available
-   flags on disk, and then rebuild the API text file, the flag_list file in the flags
-   directory, and the HTML representation of the flag list.
-   If needed, update_db.php changes old database entries to reflect the changes done.
+   The console is used for managing available flags. Operations change the available flags
+   on disk, and then rebuild the API text file, the flag_list file in the flags directory,
+   and the HTML representation of the flag list.  If needed, update_db.php changes old
+   database entries to reflect the changes done.
 
    The script expects to find the files in api/ and flags/ in a certain place on the
-   server. The entirety of the console can be rewritten, but parts of it modify the
-   API files directly.
+   server. The entirety of the console can be rewritten, but parts of it modify the API
+   files directly.
 
    The current script expects to find resources at these locations:
    
@@ -31,15 +74,3 @@
    | current flags directory | /files/flags/actual_flags/* |
    
    These will need to be routed by nginx.
-
-** wishful thinking
-
-*** How the workflow should be
-    1. clone repository to a directory
-    2. set up MySQL and PHP
-    3. have a web server serve things at specific locations
-    4. configure MySQL user and console passwords
-    5. add flags by
-       - adding flag files into the flags directory and updating flags via the console
-       - opening the console in a browser and uploading flags there
-    6. see if the client works
